@@ -7,7 +7,7 @@ export function useListaProductosViewModel() {
   const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
 
-  // Función para cargar productos desde Firestore
+  // Función para cargar productos desde Firestores
   const cargarProductos = async () => {
     try {
       const consulta = await getDocs(collection(FIRESTORE_DB, "productos"));
