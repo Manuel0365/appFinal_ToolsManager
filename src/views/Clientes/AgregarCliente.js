@@ -1,54 +1,39 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+// src/views/Clientes/AgregarCliente.js
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { collection, addDoc } from "firebase/firestore";
-import { FIRESTORE_DB } from "../firebaseConfig";
+import { useClienteViewModel } from "../../viewmodels/ClienteViewModel";
 
-export default function RegistroCliente({ navigation }) {
-  const [nombreCliente, setNombreCliente] = useState(""); // Estado para el nombre del cliente
-  const [deuda, setDeuda] = useState(""); // Estado para la deuda del cliente
-  const [fechaCompra, setFechaCompra] = useState(""); // Estado para la fecha de compra
-
-  const agregarCliente = async () => {
-    // Validar campos vacíos
-    if (!nombreCliente.trim() || !deuda.trim() || !fechaCompra.trim()) {
-      Alert.alert("Error", "Por favor completa todos los campos");
-      return;
-    }
-
-    // Validar formato de fecha
-    const formatoFecha = /^\d{2}\/\d{2}\/\d{4}$/; // Formato DD/MM/AAAA
-    if (!formatoFecha.test(fechaCompra)) {
-      Alert.alert("Error", "La fecha debe estar en formato DD/MM/AAAA");
-      return;
-    }
-
-    try {
-      // Agregar cliente a Firestore
-      await addDoc(collection(FIRESTORE_DB, "clientes"), {
-        nombreCliente,
-        deuda,
-        fechaCompra,
-      });
-
-      Alert.alert("Éxito", "Cliente agregado correctamente");
-      navigation.navigate("Clientes"); // Redirigir a la pantalla de clientes
-    } catch (error) {
-      console.error("Error al agregar cliente:", error);
-      Alert.alert("Error", "No se pudo agregar el cliente");
-    }
-  };
+export default function AgregarCliente({ navigation }) {
+  const {
+    nombreCliente,
+    deuda,
+    fechaCompra,
+    setNombreCliente,
+    setDeuda,
+    setFechaCompra,
+    agregarCliente,
+  } = useClienteViewModel(navigation);
 
   return (
     <View style={estilos.contenedor}>
       <TouchableOpacity onPress={() => navigation.navigate("Clientes")}>
-        <Ionicons name="arrow-back" size={40} color="#ccc" style={estilos.volverIcono} />
+        <Ionicons
+          name="arrow-back"
+          size={40}
+          color="#ccc"
+          style={estilos.volverIcono}
+        />
       </TouchableOpacity>
 
-      {/* Título */}
       <Text style={estilos.titulo}>Registro de Cliente</Text>
 
-      {/* Campos de Entrada */}
       <View style={estilos.grupoEntrada}>
         <Text style={estilos.etiqueta}>Nombre del cliente:</Text>
         <TextInput
@@ -79,7 +64,6 @@ export default function RegistroCliente({ navigation }) {
         />
       </View>
 
-      {/* Botones */}
       <View style={estilos.filaBotones}>
         <TouchableOpacity style={estilos.botonAgregar} onPress={agregarCliente}>
           <Text style={estilos.textoBoton}>Agregar Cliente</Text>

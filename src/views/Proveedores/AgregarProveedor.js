@@ -1,45 +1,25 @@
-import React, { useState } from "react";
+// src/views/Proveedores/AgregarProveedor.js
+import React from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { FIRESTORE_DB } from "../firebaseConfig";
-import { addDoc, collection } from "firebase/firestore";
+import { useProveedorViewModel } from "../../viewmodels/ProveedorViewModel";
 
-export default function RegistrarProveedor({ navigation }) {
-  // Estados para capturar los datos del proveedor
-  const [nombreProveedor, setNombreProveedor] = useState("");
-  const [productoOfrecido, setProductoOfrecido] = useState("");
-  const [telefono, setTelefono] = useState("");
-
-  // Función para manejar la adición del proveedor
-  const manejarAgregarProveedor = async () => {
-    // Validar que los campos no estén vacíos
-    if (!nombreProveedor.trim() || !productoOfrecido.trim() || !telefono.trim()) {
-      Alert.alert("Error", "Por favor llena todos los campos");
-      return;
-    }
-
-    try {
-      // Enviar los datos a Firestore
-      const referenciaProveedores = collection(FIRESTORE_DB, "proveedores");
-      await addDoc(referenciaProveedores, {
-        nombreProveedor,
-        productoOfrecido,
-        telefono,
-      });
-
-      Alert.alert("Éxito", "Proveedor registrado correctamente");
-      navigation.navigate("Proveedores"); // Redirige a la pantalla de Proveedores
-    } catch (error) {
-      Alert.alert("Error", "No se pudo registrar el proveedor");
-    }
-  };
+export default function AgregarProveedor({ navigation }) {
+  const {
+    nombreProveedor,
+    setNombreProveedor,
+    productoOfrecido,
+    setProductoOfrecido,
+    telefono,
+    setTelefono,
+    agregarProveedor,
+  } = useProveedorViewModel(navigation);
 
   return (
     <View style={estilos.contenedor}>
@@ -91,7 +71,7 @@ export default function RegistrarProveedor({ navigation }) {
       <View style={estilos.filaBotones}>
         <TouchableOpacity
           style={estilos.botonAgregar}
-          onPress={manejarAgregarProveedor}
+          onPress={agregarProveedor}
         >
           <Text style={estilos.textoBoton}>Agregar Proveedor</Text>
         </TouchableOpacity>

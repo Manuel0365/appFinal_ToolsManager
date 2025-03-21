@@ -90,6 +90,16 @@ export default function MenuLateral({ navigation }) {
           <Text style={estilos.textoMenu}>Inventario</Text>
           <MaterialIcons name="chevron-right" size={24} color="#007bff" />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={estilos.opcionMenu}
+          onPress={() => {
+            alternarMenu();
+            navigation.navigate("HistorialMovimientos"); // Navegar a la pantalla de Historial de Movimientos
+          }}
+        >
+          <Text style={estilos.textoMenu}>Historial de Movimientos</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#007bff" />
+        </TouchableOpacity>
 
         {/* Botón para cerrar sesión */}
         <TouchableOpacity

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// src/views/Productos/EditarProducto.js
+import React from "react";
 import {
   View,
   Text,
@@ -8,95 +9,34 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { FIRESTORE_DB } from "../firebaseConfig";
+import { useEditarProductoViewModel } from "../../viewmodels/EditarProductoViewModel";
 
 export default function EditarProducto({ route, navigation }) {
-  const { id } = route.params;
-  
-  // Estados para manejar los datos del producto
-  const [nombreProducto, setNombreProducto] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [unidadesDisponibles, setUnidadesDisponibles] = useState("");
-  const [precioVenta, setPrecioVenta] = useState("");
-
-  // Cargar datos del producto desde Firestore
-  useEffect(() => {
-    const obtenerProducto = async () => {
-      try {
-        const referenciaDocumento = doc(FIRESTORE_DB, "productos", id);
-        const documento = await getDoc(referenciaDocumento);
-
-        if (documento.exists()) {
-          const datos = documento.data();
-          setNombreProducto(datos.nombreProducto);
-          setCategoria(datos.categoria);
-          setDescripcion(datos.descripcion);
-          setUnidadesDisponibles(datos.unidadesDisponibles.toString()); // Convertir número a texto
-          setPrecioVenta(datos.precioVenta.toString()); // Convertir número a texto
-        } else {
-          Alert.alert("Error", "Producto no encontrado");
-          navigation.goBack();
-        }
-      } catch (error) {
-        Alert.alert("Error", "No se pudo cargar la información del producto");
-      }
-    };
-
-    obtenerProducto();
-  }, [id]);
-
-  // Actualizar producto en Firestore
-  const actualizarProducto = async () => {
-    try {
-      const referenciaDocumento = doc(FIRESTORE_DB, "productos", id);
-      await updateDoc(referenciaDocumento, {
-        nombreProducto,
-        categoria,
-        descripcion,
-        unidadesDisponibles: parseInt(unidadesDisponibles), // Convertir texto a número
-        precioVenta: parseFloat(precioVenta), // Convertir texto a número
-      });
-
-      Alert.alert("Éxito", "Producto actualizado correctamente");
-      navigation.navigate("Inventario");
-    } catch (error) {
-      console.error("Error al actualizar producto:", error);
-      Alert.alert("Error", "No se pudo actualizar el producto");
-    }
-  };
-
-  // Eliminar producto de Firestore
-  const eliminar = async () => {
-    Alert.alert(
-      "Confirmar eliminación",
-      "¿Estás seguro de querer eliminar este producto?",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Sí",
-          onPress: async () => {
-            try {
-              const referenciaDocumento = doc(FIRESTORE_DB, "productos", id);
-              await deleteDoc(referenciaDocumento);
-              Alert.alert("Éxito", "Producto eliminado correctamente");
-              navigation.navigate("Inventario");
-            } catch (error) {
-              console.error("Error al eliminar producto:", error);
-              Alert.alert("Error", "No se pudo eliminar el producto");
-            }
-          },
-        },
-      ]
-    );
-  };
+  const {
+    nombreProducto,
+    setNombreProducto,
+    categoria,
+    setCategoria,
+    descripcion,
+    setDescripcion,
+    unidadesDisponibles,
+    setUnidadesDisponibles,
+    precioVenta,
+    setPrecioVenta,
+    actualizarProducto,
+    eliminarProducto,
+  } = useEditarProductoViewModel(route, navigation);
 
   return (
     <View style={estilos.contenedor}>
       {/* Botón para regresar */}
       <TouchableOpacity onPress={() => navigation.navigate("Inventario")}>
-        <Ionicons name="arrow-back" size={40} color="#ccc" style={estilos.flechaAtras} />
+        <Ionicons
+          name="arrow-back"
+          size={40}
+          color="#ccc"
+          style={estilos.flechaAtras}
+        />
       </TouchableOpacity>
 
       <Text style={estilos.titulo}>Editar Producto</Text>
@@ -154,10 +94,16 @@ export default function EditarProducto({ route, navigation }) {
 
       {/* Botones de acción */}
       <View style={estilos.filaBotones}>
-        <TouchableOpacity style={estilos.botonGuardar} onPress={actualizarProducto}>
+        <TouchableOpacity
+          style={estilos.botonGuardar}
+          onPress={actualizarProducto}
+        >
           <Text style={estilos.textoBoton}>Guardar Cambios</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={estilos.botonEliminar} onPress={eliminar}>
+        <TouchableOpacity
+          style={estilos.botonEliminar}
+          onPress={eliminarProducto}
+        >
           <Text style={estilos.textoBoton}>Eliminar</Text>
         </TouchableOpacity>
       </View>
@@ -180,7 +126,7 @@ const estilos = StyleSheet.create({
     color: "#FF7F00",
     textAlign: "center",
     marginVertical: 20,
-    marginBottom: 60
+    marginBottom: 60,
   },
   grupoEntrada: {
     marginBottom: 20,

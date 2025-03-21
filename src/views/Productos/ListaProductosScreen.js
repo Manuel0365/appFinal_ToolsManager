@@ -1,39 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, FlatList, Dimensions, StyleSheet } from "react-native";
+// src/views/Productos/ListaProductosScreen.js
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import MenuLateral from "../screens/BarraLateral";
-import { collection, getDocs } from "firebase/firestore";
-import { FIRESTORE_DB } from "../firebaseConfig";
-import logo from "../assets/icon_producto.png";
+import MenuLateral from "../../../screens/BarraLateral"; // Ajusta la ruta si cambias la ubicación
+import { useListaProductosViewModel } from "../../viewmodels/ListaProductosViewModel";
+import logo from "../../../assets/icon_producto.png"; // Ajusta la ruta si mueves el archivo de assets
 
 const { width } = Dimensions.get("window");
 
-export default function ListaProductos({ navigation }) {
-  const [productos, setProductos] = useState([]); // Estado para almacenar los productos
-  const [busqueda, setBusqueda] = useState(""); // Estado para el texto de búsqueda
-
-  // Obtener productos desde Firestore
-  useEffect(() => {
-    const obtenerProductos = async () => {
-      try {
-        const consulta = await getDocs(collection(FIRESTORE_DB, "productos"));
-        const datos = consulta.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProductos(datos);
-      } catch (error) {
-        console.error("Error al obtener productos:", error);
-      }
-    };
-
-    obtenerProductos();
-  }, []);
-
-  // Filtrar productos según el texto de búsqueda
-  const productosFiltrados = productos.filter((producto) =>
-    producto.nombreProducto.toLowerCase().includes(busqueda.toLowerCase())
-  );
+export default function ListaProductosScreen({ navigation }) {
+  const { busqueda, setBusqueda, productosFiltrados } =
+    useListaProductosViewModel();
 
   return (
     <View style={estilos.contenedor}>
@@ -66,14 +52,23 @@ export default function ListaProductos({ navigation }) {
             }
           >
             <View style={estilos.infoProducto}>
-              {/* Ícono del producto */}
-              <Image source={logo} style={estilos.iconoProducto}/>
+              <Image source={logo} style={estilos.iconoProducto} />
               <View>
-                <Text style={estilos.nombreProducto}>{item.nombreProducto}</Text>
+                <Text style={estilos.nombreProducto}>
+                  {item.nombreProducto}
+                </Text>
                 <Text style={estilos.detalleProducto}>{item.categoria}</Text>
+                <Text
+                  style={
+                    item.unidadesDisponibles > 0
+                      ? estilos.estadoActivo
+                      : estilos.estadoInactivo
+                  }
+                >
+                  {item.unidadesDisponibles > 0 ? "Activo" : "Inactivo por falta de stock"}
+                </Text>
               </View>
             </View>
-            {/* Flecha para navegación */}
             <MaterialIcons name="chevron-right" size={24} color="#aaa" />
           </TouchableOpacity>
         )}
@@ -110,6 +105,17 @@ export default function ListaProductos({ navigation }) {
 }
 
 const estilos = StyleSheet.create({
+  estadoActivo: {
+    fontSize: 14,
+    color: "green",
+    fontWeight: "bold",
+  },
+  estadoInactivo: {
+    fontSize: 14,
+    color: "red",
+    fontWeight: "bold",
+  },
+
   contenedor: {
     flex: 1,
     backgroundColor: "#fff",

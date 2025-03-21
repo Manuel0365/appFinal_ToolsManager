@@ -1,8 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { FIREBASE_AUTH } from "../firebaseConfig";
+import { FIREBASE_AUTH } from "../../../firebaseConfig";
 
 export default function CrearCuentaPantalla({ navigation }) {
   const [contraseñaVisible, setContraseñaVisible] = useState(false); // Estado para controlar visibilidad de contraseña
@@ -90,7 +98,10 @@ export default function CrearCuentaPantalla({ navigation }) {
       </View>
 
       {/* Botón para registrar */}
-      <TouchableOpacity style={estilos.botonRegistrar} onPress={manejarRegistro}>
+      <TouchableOpacity
+        style={estilos.botonRegistrar}
+        onPress={manejarRegistro}
+      >
         <Text style={estilos.textoBoton}>Registrar Cuenta</Text>
       </TouchableOpacity>
 
@@ -132,7 +143,7 @@ const estilos = StyleSheet.create({
     fontWeight: "bold",
   },
   contenedorEntrada: {
-    position: "relative", 
+    position: "relative",
     width: "100%",
   },
   entrada: {
@@ -140,7 +151,7 @@ const estilos = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 8,
     padding: 10,
-    paddingRight: 40, 
+    paddingRight: 40,
     backgroundColor: "#f9f9f9",
     fontSize: 16,
   },

@@ -1,52 +1,33 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+// src/views/Productos/AgregarProducto.js
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { FIRESTORE_DB } from "../firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { useProductoViewModel } from "../../viewmodels/ProductoViewModel";
 
-export default function RegistroProducto({ navigation }) {
-  // Estados para manejar los valores de los campos
-  const [nombreProducto, setNombreProducto] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [unidadesDisponibles, setUnidadesDisponibles] = useState("");
-  const [precioVenta, setPrecioVenta] = useState("");
-
-  // Función para agregar un producto a Firestore
-  const agregarProducto = async () => {
-    // Validar que todos los campos estén llenos
-    if (
-      !nombreProducto.trim() ||
-      !categoria.trim() ||
-      !descripcion.trim() ||
-      !unidadesDisponibles.trim() ||
-      !precioVenta.trim()
-    ) {
-      Alert.alert("Error", "Por favor completa todos los campos");
-      return;
-    }
-
-    try {
-      // Guardar el producto en Firestore
-      await addDoc(collection(FIRESTORE_DB, "productos"), {
-        nombreProducto,
-        categoria,
-        descripcion,
-        unidadesDisponibles: parseInt(unidadesDisponibles),
-        precioVenta: parseFloat(precioVenta),
-      });
-
-      Alert.alert("Éxito", "Producto agregado correctamente");
-      navigation.navigate("Inventario"); // Redirige al inventario
-    } catch (error) {
-      console.error("Error al agregar producto:", error);
-      Alert.alert("Error", "No se pudo agregar el producto");
-    }
-  };
+export default function AgregarProducto({ navigation }) {
+  const {
+    nombreProducto,
+    categoria,
+    descripcion,
+    unidadesDisponibles,
+    precioVenta,
+    setNombreProducto,
+    setCategoria,
+    setDescripcion,
+    setUnidadesDisponibles,
+    setPrecioVenta,
+    agregarProducto,
+  } = useProductoViewModel(navigation);
 
   return (
     <View style={estilos.contenedor}>
-      {/* Botón para regresar */}
       <TouchableOpacity onPress={() => navigation.navigate("Inventario")}>
         <Ionicons
           name="arrow-back"
@@ -56,10 +37,8 @@ export default function RegistroProducto({ navigation }) {
         />
       </TouchableOpacity>
 
-      {/* Título */}
       <Text style={estilos.titulo}>Registro de Producto</Text>
 
-      {/* Campos de entrada */}
       <View style={estilos.grupoEntrada}>
         <Text style={estilos.etiqueta}>Nombre del producto:</Text>
         <TextInput
@@ -109,9 +88,11 @@ export default function RegistroProducto({ navigation }) {
         </View>
       </View>
 
-      {/* Botones */}
       <View style={estilos.filaBotones}>
-        <TouchableOpacity style={estilos.botonAgregar} onPress={agregarProducto}>
+        <TouchableOpacity
+          style={estilos.botonAgregar}
+          onPress={agregarProducto}
+        >
           <Text style={estilos.textoBoton}>Agregar Producto</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -133,7 +114,7 @@ const estilos = StyleSheet.create({
   },
   flechaAtras: {
     marginTop: 30,
-    marginBottom: 20
+    marginBottom: 20,
   },
   titulo: {
     fontSize: 30,
@@ -141,7 +122,7 @@ const estilos = StyleSheet.create({
     color: "#FF7F00",
     textAlign: "center",
     marginVertical: 20,
-    marginBottom: 60
+    marginBottom: 60,
   },
   grupoEntrada: {
     marginBottom: 20,

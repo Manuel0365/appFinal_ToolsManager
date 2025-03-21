@@ -1,42 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, Dimensions } from "react-native";
+// src/views/Proveedores/ListaProveedoresScreen.js
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import MenuLateral from "../screens/BarraLateral";
-import { collection, getDocs } from "firebase/firestore";
-import { FIRESTORE_DB } from "../firebaseConfig";
-import logo from "../assets/icon_cliente.png";
+import MenuLateral from "../../../screens/BarraLateral"; // Ajusta la ruta si mueves BarraLateral
+import { useListaProveedoresViewModel } from "../../viewmodels/ListaProveedoresViewModel";
+import logo from "../../../assets/icon_proveedor.png"; // Ajusta la ruta si cambias assets
 
 const { width } = Dimensions.get("window");
 
-export default function PantallaClientes({ navigation }) {
-  const [clientes, setClientes] = useState([]); // Estado para almacenar clientes
-  const [busqueda, setBusqueda] = useState(""); // Estado para el texto de búsqueda
-
-  // Obtener clientes desde Firestore al cargar el componente
-  useEffect(() => {
-    const obtenerClientes = async () => {
-      try {
-        const consulta = await getDocs(collection(FIRESTORE_DB, "clientes"));
-        const datos = consulta.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setClientes(datos);
-      } catch (error) {
-        console.error("Error al obtener clientes:", error);
-      }
-    };
-
-    obtenerClientes();
-  }, []);
-
-  // Filtrar clientes según el texto de búsqueda
-  const clientesFiltrados = clientes.filter((cliente) =>
-    cliente.nombreCliente.toLowerCase().includes(busqueda.toLowerCase())
-  );
+export default function ListaProveedoresScreen({ navigation }) {
+  const { busqueda, setBusqueda, proveedoresFiltrados } =
+    useListaProveedoresViewModel();
 
   return (
     <View style={estilos.contenedor}>
+      {/* Menú lateral */}
       <MenuLateral navigation={navigation} />
 
       {/* Barra de búsqueda */}
@@ -44,7 +31,7 @@ export default function PantallaClientes({ navigation }) {
         <MaterialIcons name="search" size={24} color="#aaa" />
         <TextInput
           style={estilos.inputBusqueda}
-          placeholder="Buscar clientes"
+          placeholder="Buscar proveedores"
           placeholderTextColor="#aaa"
           value={busqueda}
           onChangeText={setBusqueda}
@@ -52,39 +39,42 @@ export default function PantallaClientes({ navigation }) {
       </View>
 
       {/* Encabezado */}
-      <Text style={estilos.encabezado}>Clientes</Text>
+      <Text style={estilos.encabezado}>Proveedores</Text>
 
-      {/* Lista de clientes */}
+      {/* Lista de proveedores */}
       <FlatList
-        data={clientesFiltrados}
+        data={proveedoresFiltrados}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={estilos.elementoCliente}
-            onPress={() => navigation.navigate("EditarCliente", { id: item.id })}
+            style={estilos.itemProveedor}
+            onPress={() =>
+              navigation.navigate("EditarProveedor", { id: item.id })
+            }
           >
-            <View style={estilos.informacionCliente}>
-              {/* Ícono del cliente */}
-              <Image source={logo} style={estilos.iconoCliente}/>
+            <View style={estilos.infoProveedor}>
+              <Image source={logo} style={estilos.iconoProveedor} />
               <View>
-                <Text style={estilos.nombreCliente}>{item.nombreCliente}</Text>
-                <Text style={estilos.detalleCliente}>Deuda: ${item.deuda}</Text>
+                <Text style={estilos.nombreProveedor}>
+                  {item.nombreProveedor}
+                </Text>
+                <Text style={estilos.detalleProveedor}>
+                  {item.productoOfrecido}
+                </Text>
               </View>
             </View>
-
-            {/* Flecha para navegación */}
             <MaterialIcons name="chevron-right" size={24} color="#aaa" />
           </TouchableOpacity>
         )}
         ListEmptyComponent={
-          <Text style={estilos.textoVacio}>No se encontraron clientes</Text>
+          <Text style={estilos.textoVacio}>No se encontraron proveedores</Text>
         }
       />
 
-      {/* Botón flotante para agregar cliente */}
+      {/* Botón flotante para agregar proveedores */}
       <TouchableOpacity
         style={estilos.botonFlotante}
-        onPress={() => navigation.navigate("AgregarCliente")}
+        onPress={() => navigation.navigate("AgregarProveedor")}
       >
         <MaterialIcons name="add" size={30} color="#fff" />
       </TouchableOpacity>
@@ -92,13 +82,13 @@ export default function PantallaClientes({ navigation }) {
       {/* Barra de navegación inferior */}
       <View style={estilos.barraNavegacion}>
         <TouchableOpacity
-          style={estilos.botonNavegacion}
+          style={estilos.botonNav}
           onPress={() => navigation.navigate("Home")}
         >
           <MaterialIcons name="home" size={30} color="#aaa" />
         </TouchableOpacity>
         <TouchableOpacity
-          style={estilos.botonNavegacion}
+          style={estilos.botonNav}
           onPress={() => navigation.navigate("Notification")}
         >
           <MaterialIcons name="notifications" size={30} color="#aaa" />
@@ -136,7 +126,7 @@ const estilos = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
   },
-  elementoCliente: {
+  itemProveedor: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -144,22 +134,22 @@ const estilos = StyleSheet.create({
     borderBottomColor: "#eee",
     paddingVertical: 15,
   },
-  informacionCliente: {
+  infoProveedor: {
     flexDirection: "row",
     alignItems: "center",
   },
-  iconoCliente: {
+  iconoProveedor: {
     width: 50,
     height: 50,
     borderRadius: 25,
     marginRight: 10,
   },
-  nombreCliente: {
+  nombreProveedor: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
   },
-  detalleCliente: {
+  detalleProveedor: {
     fontSize: 14,
     color: "blue",
   },
@@ -167,7 +157,6 @@ const estilos = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     color: "#aaa",
-    marginTop: 20,
   },
   barraNavegacion: {
     position: "absolute",
@@ -180,7 +169,7 @@ const estilos = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ddd",
   },
-  botonNavegacion: {
+  botonNav: {
     alignItems: "center",
     justifyContent: "center",
   },
